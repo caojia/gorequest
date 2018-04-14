@@ -619,6 +619,12 @@ func (s *SuperAgent) SendMap(content interface{}) *SuperAgent {
 	return s.SendStruct(content)
 }
 
+//发送 binary
+func (s *SuperAgent) SendBinary(content []byte) *SuperAgent {
+	s.BinaryData = append(s.BinaryData, content...)
+	return s
+}
+
 // SendStruct (similar to SendString) returns SuperAgent's itself for any next chain and takes content interface{} as a parameter.
 // Its duty is to transfrom interface{} (implicitly always a struct) into s.Data (map[string]interface{}) which later changes into appropriate format such as json, form, text, etc. in the End() func.
 func (s *SuperAgent) SendStruct(content interface{}) *SuperAgent {
