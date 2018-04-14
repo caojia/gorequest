@@ -142,6 +142,7 @@ func (s *SuperAgent) ClearSuperAgent() {
 	s.TargetType = "json"
 	s.Cookies = make([]*http.Cookie, 0)
 	s.Errors = nil
+	s.BinaryData = make([]byte, 0)
 }
 
 // Just a wrapper to initialize SuperAgent instance by method string
@@ -617,6 +618,12 @@ func (s *SuperAgent) SendSlice(content []interface{}) *SuperAgent {
 
 func (s *SuperAgent) SendMap(content interface{}) *SuperAgent {
 	return s.SendStruct(content)
+}
+
+//发送 binary
+func (s *SuperAgent) SendBinary(content []byte) *SuperAgent {
+	s.BinaryData = append(s.BinaryData, content...)
+	return s
 }
 
 // SendStruct (similar to SendString) returns SuperAgent's itself for any next chain and takes content interface{} as a parameter.
