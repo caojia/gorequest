@@ -5,28 +5,24 @@ import (
 	"bytes"
 	"crypto/tls"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
+	"mime/multipart"
 	"net"
 	"net/http"
 	"net/http/cookiejar"
 	"net/http/httputil"
+	"net/textproto"
 	"net/url"
 	"os"
+	"path/filepath"
 	"reflect"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/pkg/errors"
-
-	"mime/multipart"
-
-	"net/textproto"
-
-	"fmt"
-
-	"path/filepath"
 
 	"github.com/moul/http2curl"
 	"golang.org/x/net/publicsuffix"
@@ -48,6 +44,7 @@ const (
 
 // A SuperAgent is a object storing all request data for client.
 type SuperAgent struct {
+	BinaryData        []byte
 	Url               string
 	Method            string
 	Header            map[string]string
@@ -307,6 +304,7 @@ var Types = map[string]string{
 	"form":       "application/x-www-form-urlencoded",
 	"form-data":  "application/x-www-form-urlencoded",
 	"multipart":  "multipart/form-data",
+	"binary":     "application/octet-stream",
 }
 
 // Type is a convenience function to specify the data type to send.
@@ -1007,7 +1005,7 @@ func (s *SuperAgent) getResponseBytes() (Response, []byte, []error) {
 	}
 	// check if there is forced type
 	switch s.ForceType {
-	case "json", "form", "xml", "text", "multipart":
+	case "json", "form", "xml", "text", "multipart", "binary":
 		s.TargetType = s.ForceType
 		// If forcetype is not set, check whether user set Content-Type header.
 		// If yes, also bounce to the correct supported TargetType automatically.
@@ -1093,8 +1091,14 @@ func (s *SuperAgent) MakeRequest() (*http.Request, error) {
 	if s.Method == "" {
 		return nil, errors.New("No method specified")
 	}
-
-	if s.TargetType == "json" {
+	if s.TargetType == "binary" {
+		contentReader := bytes.NewReader(s.BinaryData)
+		req, err = http.NewRequest(s.Method, s.Url, contentReader)
+		if err != nil {
+			return nil, err
+		}
+		req.Header.Set("Content-Type", Types["binary"])
+	} else if s.TargetType == "json" {
 		// If-case to give support to json array. we check if
 		// 1) Map only: send it as json map from s.Data
 		// 2) Array or Mix of map & array or others: send it as rawstring from s.RawString
