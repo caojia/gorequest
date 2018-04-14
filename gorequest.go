@@ -142,6 +142,7 @@ func (s *SuperAgent) ClearSuperAgent() {
 	s.TargetType = "json"
 	s.Cookies = make([]*http.Cookie, 0)
 	s.Errors = nil
+	s.BinaryData = make([]byte, 0)
 }
 
 // Just a wrapper to initialize SuperAgent instance by method string
