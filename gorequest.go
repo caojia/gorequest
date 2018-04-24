@@ -846,6 +846,14 @@ func changeMapToURLValues(data map[string]interface{}) url.Values {
 			newUrlValues.Add(k, string(val))
 		case int:
 			newUrlValues.Add(k, strconv.FormatInt(int64(val), 10))
+		case int8:
+			newUrlValues.Add(k, strconv.FormatInt(int64(val), 10))
+		case int16:
+			newUrlValues.Add(k, strconv.FormatInt(int64(val), 10))
+		case int32:
+			newUrlValues.Add(k, strconv.FormatInt(int64(val), 10))
+		case int64:
+			newUrlValues.Add(k, strconv.FormatInt(val, 10))
 		// TODO add all other int-Types (int8, int16, ...)
 		case float64:
 			newUrlValues.Add(k, strconv.FormatFloat(float64(val), 'f', -1, 64))
